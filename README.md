@@ -1,19 +1,21 @@
 # bulletin
 
-FIXME
+A bolt-on bulletin board system.
 
-## Prerequisites
+## Setting up for local development
 
-You will need [Leiningen][1] 1.7.0 or above installed.
+Install leiningen so that you have the `lein` command available in your console.
 
-[1]: https://github.com/technomancy/leiningen
+Use environment variables to configure bulletin. A nice way to do this is to create `.lein-env` in the root directory:
 
-## Running
+    {:database-url "postgres://<dbuser>:<dbpassword>@localhost:5432/bulletin"}
 
-To start a web server for the application, run:
+You can also provide `:port <Number>`, but the default port will be 3000.
 
-    lein ring server
+Now boot the server:
 
-## License
+    lein ring server-headless
 
-Copyright © 2014 FIXME
+To make the server create the database tables with see data, visit `http://localhost:3000/reset-db`.
+
+The webiste should now be running on `http://localhost:3000`.

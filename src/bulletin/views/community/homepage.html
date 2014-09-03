@@ -1,0 +1,26 @@
+{% extends "bulletin/views/community/layout.html" %}
+{% block template %}
+
+{% for category in categories %}
+  <h2>{{ category.title }}</h2>
+  <p class="lead">{{ category.description }}</p>
+  <ul class="list-group">
+  {% for forum in category.forums %}
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-sm-8">
+          <a href="/forums/{{ forum.id }}">{{ forum.title }}</a>
+          <br>{{ forum.description }}
+        </div>
+        <div class="col-sm-2">
+          {{ forum.topics_count }} topics<br>{{ forum.posts_count }} posts
+        </div>
+        <div class="col-sm-2">
+        </div>
+      </div>
+    </li>
+  {% endfor %}
+  </ul>
+{% endfor %}
+
+{% endblock %}

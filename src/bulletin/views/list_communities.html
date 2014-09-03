@@ -1,0 +1,11 @@
+{% extends "bulletin/views/layout.html" %}
+{% block template %}
+
+<h2>All Communities</h2>
+<ul>
+{% for community in communities %}
+  <li>{{ community.name }}</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

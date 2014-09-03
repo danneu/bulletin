@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="A bolt-on bulletin board system"
+          name="description">
+
+    <link rel="icon" href="/favicon.ico">
+
+    <title>
+      {% if title %}
+        {{title}} &mdash Bulletin
+      {% else %}
+        The Bolt-On Bulletin Board &mdash; Bulletin
+      {% endif %}
+    </title>
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <!-- <link href="{{= it.this.css_vendor_path}}" rel="stylesheet"> -->
+    <!-- <link href="{{= it.this.css_app_path}}" rel="stylesheet"> -->
+    <!-- <link href="http://fonts.googleapis.com/css?family=Merriweather:700" rel="stylesheet" type="text/css"> -->
+    <!-- <link href="navbar-static-top.css" rel="stylesheet"> -->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+
+    <!-- Static navbar -->
+    <div class="navbar navbar-default navbar-static-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">Bulletin <span class="label label-default">Beta</span></a>
+        </div>
+
+        <!-- When not logged in -->
+        <form class="navbar-form navbar-right"
+              action="/sessions"
+              method="post">
+          <div class="form-group">
+            <input name="creds[username]"
+                   type="text"
+                   class="form-control"
+                   placeholder="Username">
+          </div>
+          <div class="form-group">
+            <input name="creds[password]"
+                   type="password"
+                   class="form-control"
+                   placeholder="Password">
+          </div>
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+
+      </div>
+    </div>
+
+
+    <div class="container">
+
+      <!-- Alert message -->
+      <!-- {{? it.this.flash && it.this.flash.message}} -->
+      <!--   <div class="alert alert-{{= it.this.flash.message[0]}}"> -->
+      <!--     {{= it.this.flash.message[1]}} -->
+      <!--   </div> -->
+      <!-- {{?}} -->
+
+      <!-- Start content -->
+      {% block template %}{% endblock %}
+      <!-- End content -->
+
+      <!-- Footer -->
+      <div class="footer">
+        <hr>
+        <ul class="list-inline">
+          <li>&copy; 2014</li>
+        </ul>
+      </div>
+
+    </div> <!-- /container -->
+
+    <!-- <script src="{{= it.this.js_vendor_path}}"></script> -->
+    <!-- <script src="{{= it.this.js_app_path}}"></script> -->
+  </body>
+</html>
