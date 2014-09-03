@@ -18,6 +18,6 @@ Now boot the server:
 
     lein ring server-headless
 
-To make the server create the database tables with see data, visit `http://localhost:3000/reset-db`.
+To force the server to create the database tables and then populate them with seed data, visit `http://localhost:3000/reset-db`.
 
 The webiste should now be running on `http://localhost:3000`.
