@@ -2,6 +2,8 @@
 
 A bolt-on bulletin board system.
 
+A recently started stubbing out a experimental forum system at [www.fed.nu](http://www.fed.nu), so that's what this is kinda gonna look like.
+
 ## Setting up for local development
 
 Install leiningen so that you have the `lein` command available in your console.
