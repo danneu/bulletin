@@ -46,7 +46,7 @@
         </div>
 
 
-        {% if current-user %}
+        {% if current-user.id %}
         <form class="navbar-form navbar-right" action="/sessions" method="post">
           <input type="hidden" name="_method" value="DELETE">
           <input type="submit" value="Log out" class="btn btn-link">

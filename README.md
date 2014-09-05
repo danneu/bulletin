@@ -37,5 +37,8 @@ The website should now be running on `http://localhost:3000`.
 - Flood protection
 - Users should only be able to  edit their posts for a certain duration
 - Find java/clj markdown lib that's compatible enough with markdown.js that also escapes user html like markdown.js does. So far no good.
+- For now I'm disabling buttons that the current user is unauthorized to use so that I can quickly reason about my progress and the look/feel. But I will eventually avoid rendering the buttons completely instead of just greying them out.
+- I'm used to using Hiccup for templating which makes it trivial to share my cancan.clj between routes and templates. However, this is my first time using Selmer and so far my approach of shoehorning `can-*-?` keys into random objects has been ugly and feels so ad-hoc.
+- I really need to document things like what `*current-user*` actually looks like. What kind of things can get assoc'd to it. Etc.
 
 And much much more...

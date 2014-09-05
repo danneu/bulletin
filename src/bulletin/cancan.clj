@@ -5,10 +5,12 @@
    [bulletin.db :as db]))
 
 
-;;
-;; This namespace will be the core authorization abstraction as I figure out
-;; how I want to do it. As I make breakthroughs, I will try to clean it up.
-;;
+;;;;
+;;;; This namespace will be the core authorization abstraction as I figure out
+;;;; how I want to do it. As I make breakthroughs, I will try to clean it up.
+;;;;
+;;;; Once I'm happy enough with my abstraction/implementation, I'll add tests
+;;;;
 
 ;; Only the admin can create categories and forums
 
@@ -62,6 +64,7 @@
     role))
 (def get-comm-roles get-community-roles)
 
+;; TODO: Tests
 (def users {:gadmin (db/find-user 1)
             :cadmin1 (db/find-user 2)
             :cadmin2 (db/find-user 3)
@@ -72,13 +75,19 @@
             :member (db/find-user 8)
             })
 
+(defn guest?
+  "User is not logged in"
+  [user]
+  (nil? (:id user)))
+
 ;; (let [com1 (db/find-community 1)]
 ;;   (assert (member? (get-comm-roles (:member users) com1)))
 ;;   (assert (false? (member? (get-community-roles (:cadmin1 users) com1))))
 ;;   )
 
 
-;; target: {:community _, :forum _}
+;; target must at least have :communtiy key
+;; target: {:community _, :forum _, maybe :topic, maybe :post _}
 ;; action: a keyword
 
 (defn can? [user action target]
@@ -94,11 +103,14 @@
         ;;;
         ;;; Create
         ;;;
-        :create-topic (not (banned? user community-roles))
+        :create-topic (and (not (guest? user))
+                           (not (banned? user community-roles)))
         :create-category (community-admin? community-roles)
         :create-forum (community-admin? community-roles)
         ;; TODO: Check if topic is closed/hidden
-        :create-post (and (not (community-banned? community-roles))
+        :create-post (and (not (:is_closed (:topic target)))
+                          (not (guest? user))
+                          (not (community-banned? community-roles))
                           (not (globally-banned? user)))
         ;; Anyone can create a community unless user is globally banned
         :create-community (not (globally-banned? user))

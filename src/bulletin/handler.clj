@@ -44,7 +44,8 @@
 (def ^:dynamic *current-user* nil)
 (defn wrap-current-user
   "Loads current user from {:session_id _} in their session if it matches a
-   row in the sessions table."
+   row in the sessions table. Guests can be differentiated from logged-in users
+   because guests do not have :id."
   [handler]
   (fn [request]
     (println "\n=====\nSESSION:" (-> request :session))
@@ -312,11 +313,22 @@
         (let [posts (for [post (db/find-topic-posts-paginated topic-id 1)
                           :let [html (-> (:text post)
                                          ;; FIXME: (escape-html)
-                                         (markdown/md-to-html-string))]]
-                      (assoc post :html html))]
+                                         (markdown/md-to-html-string))
+                                can-update? (can/can?
+                                             *current-user*
+                                             :update-post
+                                             {:community *current-community*
+                                              :post post})]]
+                      (assoc post :html html))
+              can-create-post? (can/can? *current-user*
+                                         :create-post
+                                         {:community *current-community*
+                                          :topic topic})]
           (p/render-file "bulletin/views/community/show_topic.html"
                          {:current-community *current-community*
-                          :current-user *current-user*
+                          :current-user (assoc *current-user*
+                                          :can-create-post?
+                                          can-create-post?)
                           :topic topic
                           :posts posts})))))
   ;;

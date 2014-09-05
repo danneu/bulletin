@@ -56,18 +56,25 @@
     <!-- Reply button -->
     <a href="" class="btn btn-default btn-xs pull-right post-reply-btn" post-id="{{ post.id }}" style="margin-left: 5px">Reply</a>
     <!-- Edit button -->
-    <a href="/" class="btn btn-default btn-xs pull-right post-edit-btn" style="margin-left: 5px;" post-id={{post.id}}>Edit</a>
+    <a href="/"
+       class="btn btn-default btn-xs pull-right post-edit-btn"
+       style="margin-left: 5px;"
+       post-id={{post.id}}
+       {%if post.can-update?%}{%else%}disabled{%endif%}
+       >Edit</a>
   </div>
 </div>
 {% endfor %}
 
-<!-- New reply -->
-<h2>New Reply</h2>
-<form id="reply-form" role="form" method="post" action="/forums/{{topic.forum.id}}/topics/{{topic.id}}/posts">
-  <div class="form-group">
-    <textarea rows=10 name="post-text" class="form-control" placeholder="Click here and begin writing" data-provide="markdown"></textarea>
-  </div>
-  <input type="submit" class="btn btn-primary" value="Post Reply"></input>
-</form>
+{% if current-user.can-create-post? %}
+  <!-- New reply -->
+  <h2>New Reply</h2>
+  <form id="reply-form" role="form" method="post" action="/forums/{{topic.forum.id}}/topics/{{topic.id}}/posts">
+    <div class="form-group">
+      <textarea rows=10 name="post-text" class="form-control" placeholder="Click here and begin writing" data-provide="markdown"></textarea>
+    </div>
+    <input type="submit" class="btn btn-primary" value="Post Reply"></input>
+  </form>
+{% endif %}
 
 {% endblock %}
