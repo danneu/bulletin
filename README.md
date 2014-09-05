@@ -33,5 +33,9 @@ The website should now be running on `http://localhost:3000`.
 - Implement authorization and protect routes with it
 - Add CSRF protection
 - Add tests for authorization rules at the very least
+- Recaptcha community creation
+- Flood protection
+- Users should only be able to  edit their posts for a certain duration
+- Find java/clj markdown lib that's compatible enough with markdown.js that also escapes user html like markdown.js does. So far no good.
 
 And much much more...

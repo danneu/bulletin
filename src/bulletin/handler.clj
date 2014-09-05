@@ -73,7 +73,7 @@
   (GET "/reset-db" []
     (if (can/can? *current-user* :reset-db {})
       (db/reset-db!)
-      {:status 403, :body "Can't let you do that"}))
+      {:status 403, :body "Can't let you reset the db"}))
   ;;
   ;; Registration Page
   ;;
@@ -115,7 +115,7 @@
     (if (can/cannot? *current-user*
                      :create-category
                      {:community *current-community*})
-      {:status 403, :body "Can't let you do that"}
+      {:status 403, :body "Can't let you create a category"}
       (p/render-file "bulletin/views/community/new_category.html"
                      {:current-user *current-user*
                       :current-community *current-community*})))
@@ -126,7 +126,7 @@
     (if (can/cannot? *current-user*
                      :create-forum
                      {:community *current-community*})
-      {:status 403, :body "Can't let you do that"}
+      {:status 403, :body "Can't let you create a forum"}
       (let [categories (db/find-categories (:id *current-community*))]
         (p/render-file "bulletin/views/community/new_forum.html"
                        {:current-user *current-user*
@@ -139,7 +139,7 @@
     (if (can/cannot? *current-user*
                      :create-forum
                      {:community *current-community*})
-      {:status 403, :body "Can't let you do that"}
+      {:status 403, :body "Can't let you create a forum"}
       (let [title (-> req :params :forum :title)
             description (-> req :params :forum :description)
             ;; FIXME: Fails if client sends non-integer string
@@ -166,7 +166,7 @@
     (if (can/cannot? *current-user*
                      :create-category
                      {:community *current-community*})
-      {:status 403, :body "Can't let you do that"}
+      {:status 403, :body "Can't let you create a category"}
       (let [title (-> req :params :category :title)
             description (-> req :params :category :description)]
         ;; TODO: Allow user to change position
@@ -206,12 +206,12 @@
                        :create-post
                        {:community *current-community*
                         :forum forum})
-        {:status 403, :body "Can't let you do that"}
+        {:status 403, :body "Can't let you create a post"}
         (let [post-text (get-in req [:params :post-text])
               topic-id (Integer/parseInt topic-id)
               ip (:remote-addr req)
               _ (println ip)
-              post (db/create-post! {:user_id 1
+              post (db/create-post! {:user_id (:id *current-user*)
                                      :topic_id topic-id
                                      :text post-text
                                      :ip ip})]
@@ -226,7 +226,7 @@
                        :read-forum
                        {:community *current-community*
                         :forum forum})
-        {:status 403, :body "Can't let you do that"}
+        {:status 403, :body "Can't let you read this forum"}
         (let  [topics (db/find-forum-topics forum-id)]
           (p/render-file "bulletin/views/community/show_forum.html"
                          {:current-community *current-community*
@@ -243,7 +243,7 @@
                        :create-topic
                        {:community *current-community*
                         :forum forum})
-        {:status 403, :body "Can't let you do that"}
+        {:status 403, :body "Can't let you create a topic"}
         (let [title (-> req :params :topic :title)
               text (-> req :params :topic :text)
               ip (:remote-addr req)]
@@ -271,7 +271,7 @@
                        {:community *current-community*
                         :forum (:forum post)
                         :post post})
-        {:status 403, :body "Can't let you do that"}
+        {:status 403, :body "Can't let you read this post"}
         (:text post))))
   ;;
   ;; Update post via AJAX
@@ -287,7 +287,7 @@
                        {:community *current-community*
                         :forum (:forum post)
                         :post post})
-        {:status 403, :body "Can't let you do that"}
+        {:status 403, :body "Can't let you update this post"}
         ;; Don't consider the post edited if nothing was updated
         (let [response (if (= new-text (:text post))
                          post
@@ -302,10 +302,10 @@
           topic-id (Integer/parseInt topic-id)
           topic (db/find-topic topic-id)]
       (if (can/cannot? *current-user*
-                       :update-post
+                       :read-topic
                        {:community *current-community*
                         :forum (:forum topic)})
-        {:status 403, :body "Can't let you do that"}
+        {:status 403, :body "Can't let you read this topic"}
         ;; Render the markdown for each post on the fly
         ;; FIXME: I need to render markdown like `<http://google.com>` without
         ;;        allowing xss `<script>...` and other arbitrary html
@@ -349,7 +349,7 @@
   ;;
   (POST "/communities" req
     (if (can/cannot? *current-user* :create-community {})
-      {:status 403, :body "Can't let you do that"}
+      {:status 403, :body "Can't let you create a community"}
       (let [params (select-keys (:params req) [:name :slug])
             ;; TODO: Validate params
             community (db/create-community! {:name (:name params)
