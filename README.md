@@ -31,3 +31,7 @@ The website should now be running on `http://localhost:3000`.
 
 - Add more `ON DELETE CASCADE`
 - Implement authorization and protect routes with it
+- Add CSRF protection
+- Add tests for authorization rules at the very least
+
+And much much more...
