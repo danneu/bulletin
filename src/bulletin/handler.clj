@@ -228,10 +228,16 @@
                        {:community *current-community*
                         :forum forum})
         {:status 403, :body "Can't let you read this forum"}
-        (let  [topics (db/find-forum-topics forum-id)]
+        (let [topics (db/find-forum-topics forum-id)
+              can-create-topic? (can/can?
+                                 *current-user*
+                                 :create-topic
+                                 {:community *current-community*})]
           (p/render-file "bulletin/views/community/show_forum.html"
                          {:current-community *current-community*
-                          :current-user *current-user*
+                          :current-user (assoc *current-user*
+                                          :can-create-topic?
+                                          can-create-topic?)
                           :forum forum
                           :topics topics})))))
   ;;
