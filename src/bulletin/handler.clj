@@ -307,7 +307,7 @@
                         :forum (:forum topic)})
         {:status 403, :body "Can't let you do that"}
         ;; Render the markdown for each post on the fly
-        ;; FIXME: I need to render markdown like `<http://google.com>` with
+        ;; FIXME: I need to render markdown like `<http://google.com>` without
         ;;        allowing xss `<script>...` and other arbitrary html
         (let [posts (for [post (db/find-topic-posts-paginated topic-id 1)
                           :let [html (-> (:text post)
