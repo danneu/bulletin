@@ -105,9 +105,10 @@
         ;;;
         ;;; Read
         ;;;
-        ;; TODO: Check if topic is hidden
         :read-forum true
+        ;; TODO: Check if post is deleted(hidden)
         :read-post true
+        ;; TODO: Check if topic is hidden
         :read-topic true
         ;;:
         ;;; Update
