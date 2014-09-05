@@ -211,7 +211,7 @@
               topic-id (Integer/parseInt topic-id)
               ip (:remote-addr req)
               _ (println ip)
-              post (db/create-post! {:user_id 1
+              post (db/create-post! {:user_id (:id *current-user*)
                                      :topic_id topic-id
                                      :text post-text
                                      :ip ip})]
@@ -302,10 +302,10 @@
           topic-id (Integer/parseInt topic-id)
           topic (db/find-topic topic-id)]
       (if (can/cannot? *current-user*
-                       :update-post
+                       :read-topic
                        {:community *current-community*
                         :forum (:forum topic)})
-        {:status 403, :body "Can't let you do that"}
+        {:status 403, :body "Can't show you that topic"}
         ;; Render the markdown for each post on the fly
         ;; FIXME: I need to render markdown like `<http://google.com>` without
         ;;        allowing xss `<script>...` and other arbitrary html

@@ -33,5 +33,7 @@ The website should now be running on `http://localhost:3000`.
 - Implement authorization and protect routes with it
 - Add CSRF protection
 - Add tests for authorization rules at the very least
+- Recaptcha community creation
+- Flood protection
 
 And much much more...

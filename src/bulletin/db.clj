@@ -325,31 +325,107 @@ OFFSET ?
     (j/with-db-connection [conn db-spec]
       ;; Rebuild DB
       (j/execute! conn [reset-sql])
+
+
+;; INSERT INTO communities (title, slug)
+;; VALUES ('foo', 'foo');
+;; INSERT INTO categories (title, description, community_id, position)
+;; VALUES ('Test Category', 'Test description', 1, 0);
+;; INSERT INTO forums (category_id, title, description, position)
+;; VALUES (1, 'Test forum', 'Desc', 0);
+;; INSERT INTO topics (forum_id, title, user_id)
+;; VALUES (1, 'Test topic', 1);
+;; INSERT INTO posts (topic_id, user_id, text)
+;; VALUES (1, 1, 'Test post');
+      ;; Comm 1
+
       ;; Seed users
-      (create-user! {:username "danneu",  ; user 1
-                     :email "danneu@example.com",
+      ;; User 1
+      (create-user! {:username "gadmin",
+                     :email "gadmin@example.com",
                      :password "secret"})
-      (create-user! {:username "foo",  ; user 2
-                     :email "foo@example.com",
+      ;; 2
+      (create-user! {:username "cadmin1",
+                     :email "cadmin1@example.com",
                      :password "secret"})
-      (create-user! {:username "member",  ; user 3
+      ;; 3
+      (create-user! {:username "cadmin2",
+                     :email "cadmin2@example.com",
+                     :password "secret"})
+      ;; 4
+      (create-user! {:username "smod1",
+                     :email "smod1@example.com",
+                     :password "secret"})
+      ;; 5
+      (create-user! {:username "smod2",
+                     :email "smod2@example.com",
+                     :password "secret"})
+      ;; 6
+      (create-user! {:username "mod1-f1",
+                     :email "mod1-f1@example.com",
+                     :password "secret"})
+      ;; 7
+      (create-user! {:username "mod1-f2",
+                     :email "mod1-f2@example.com",
+                     :password "secret"})
+      ;; 8
+      (create-user! {:username "member",
                      :email "member@example.com",
                      :password "secret"})
-      (create-user! {:username "smod",  ; user 4
-                     :email "smod@example.com",
-                     :password "secret"})
+      (let [com1 (create-community! {:name "Community 1", :slug "community-1"})
+            com2 (create-community! {:name "Community 2", :slug "community-2"})
+            cat1 (create-category! {:community_id (:id com1)
+                                    :title "Category 1"
+                                    :description "Category 1 description"})
+            cat2 (create-category! {:community_id (:id com2)
+                                    :title "Category 2"
+                                    :description "Category 2 description"})
+            f1 (create-forum! {:category_id (:id cat1)
+                               :title "Forum 1"
+                               :description "Forum 1 description"})
+            f2 (create-forum! {:category_id (:id cat2)
+                               :title "Forum 2"
+                               :description "Forum 2 description"})
+            t1 (create-topic! {:forum_id (:id f1)
+                               :title "Topic 1"
+                               :user_id 1
+                               :text "hello world"})
+            t2 (create-topic! {:forum_id (:id f2)
+                              :title "Topic 1"
+                              :user_id 1
+                               :text "hello world"})
+            ])
+
+      (j/execute! conn ["
+INSERT INTO roles (user_id, title)
+VALUES (1, 'admin');
+"])
+      (j/execute! conn ["
+INSERT INTO roles (user_id, title, community_id)
+VALUES (2, 'admin', 1);
+"])
+      (j/execute! conn ["
+INSERT INTO roles (user_id, title, community_id)
+VALUES (3, 'admin', 2);
+"])
+      (j/execute! conn ["
+INSERT INTO roles (user_id, title, community_id)
+VALUES (4, 'smod', 1);
+"])
+      (j/execute! conn ["
+INSERT INTO roles (user_id, title, community_id)
+VALUES (5, 'smod', 2);
+"])
+      (j/execute! conn ["
+INSERT INTO roles (user_id, title, community_id, forum_id)
+VALUES (6, 'mod', 1, 1);
+"])
+      (j/execute! conn ["
+INSERT INTO roles (user_id, title, community_id, forum_id)
+VALUES (7, 'mod', 1, 2);
+"])
       ;; Seed db
       (j/execute! conn ["
-INSERT INTO communities (title, slug)
-VALUES ('foo', 'foo');
-INSERT INTO categories (title, description, community_id, position)
-VALUES ('Test Category', 'Test description', 1, 0);
-INSERT INTO forums (category_id, title, description, position)
-VALUES (1, 'Test forum', 'Desc', 0);
-INSERT INTO topics (forum_id, title, user_id)
-VALUES (1, 'Test topic', 1);
-INSERT INTO posts (topic_id, user_id, text)
-VALUES (1, 1, 'Test post');
 
 -- Create global admin
 INSERT INTO roles (user_id, title)
