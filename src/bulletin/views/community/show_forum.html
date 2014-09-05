@@ -1,0 +1,61 @@
+{% extends "bulletin/views/community/layout.html" %}
+{% block template %}
+
+<!-- variables:
+     current-community
+     forum
+     topics
+       latest-post
+       latest-user
+-->
+
+<ol class="breadcrumb">
+  <li>
+    <a href="/">Home</a>
+  </li>
+  <li class="active">{{ forum.category.title }}</li>
+</ol>
+
+<h1>{{ forum.title }}</h1>
+<p class="lead">{{ forum.description }}</p>
+
+<!-- Topics list -->
+<ul class="list-group">
+  {% for topic in topics %}
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-md-8">
+        <a href="/forums/{{ forum.id }}/topics/{{ topic.id }}">{{ topic.title }}</a>
+        <br>
+        by {{ topic.user.username }}, {{ topic.created_at|date:shortDateTime}}
+      </div>
+      <div class="col-md-2">{{ topic.posts_count }} posts</div>
+      <!-- Latest post -->
+      <div class="col-md-2">
+        <a href="">Latest post</a>
+        by
+        <a href="/forums/{{forum.id}}/topics/{{topic.id}}">
+          {{topic.latest_user.username}}
+        </a>
+        <br>
+        {{topic.latest-post.created_at|date:shortDateTime}}
+      </div>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+
+<!-- New topic -->
+
+<h2>New Topic</h2>
+<form role="form" method="post" action="/forums/{{ forum.id }}/topics">
+  <div class="form-group">
+    <input name="topic[title]" type="text" class="form-control" id="asdf" placeholder="Topic Name">
+  </div>
+  <div class="form-group">
+    <textarea rows=10 name="topic[text]" class="form-control" placeholder="Click here and start writing the first post" data-provide="markdown"></textarea>
+  </div>
+  <input type="submit" class="btn btn-primary" value="Create Topic"></input>
+</form>
+
+{% endblock %}

@@ -1,8 +1,8 @@
 # bulletin
 
-A bolt-on bulletin board system.
+A bulletin board service like proboards except written in Clojure.
 
-A recently started stubbing out a experimental forum system at [www.fed.nu](http://www.fed.nu), so that's what this is kinda gonna look like.
+A recently started stubbing out an experimental forum system at [www.fed.nu](http://www.fed.nu) (to learn Koa), so that's what this is kinda gonna look like.
 
 ## Setting up for local development
 
@@ -20,4 +20,14 @@ Now boot the server:
 
 To force the server to create the database tables and then populate them with seed data, visit `http://localhost:3000/reset-db`.
 
-The webiste should now be running on `http://localhost:3000`.
+The website should now be running on `http://localhost:3000`.
+
+## Misc
+
+- Using bootstrap v3.2.0
+- Using bootstrap-markdown v2.6.0 (jQuery v2.1.1) Deps on bootstrap 3.1.1 but I'll use 3.2.0 for convenience for now
+
+## TODO
+
+- Add more `ON DELETE CASCADE`
+- Implement authorization and protect routes with it

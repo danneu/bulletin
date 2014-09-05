@@ -1,0 +1,25 @@
+{% extends "bulletin/views/community/layout.html" %}
+{% block template %}
+
+<!-- variables:
+-->
+
+<h1>New User</h1>
+
+<form role="form" method="post" action="/users">
+  <div class="form-group">
+    <input name="user[username]" type="text" class="form-control" id="asdf" placeholder="Username">
+  </div>
+  <div class="form-group">
+    <input name="user[email]" type="text" class="form-control" id="asdf" placeholder="Email">
+  </div>
+  <div class="form-group">
+    <input name="user[password1]" type="password" class="form-control" id="asdf" placeholder="Password">
+  </div>
+  <div class="form-group">
+    <input name="user[password2]" type="password" class="form-control" id="asdf" placeholder="Password (Confirm)">
+  </div>
+  <input type="submit" class="btn btn-primary" value="Register">
+</form>
+
+{% endblock %}

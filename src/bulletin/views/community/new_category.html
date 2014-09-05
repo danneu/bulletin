@@ -1,0 +1,15 @@
+{% extends "bulletin/views/community/layout.html" %}
+{% block template %}
+
+<h1>New Category</h1>
+<form role="form" method="post" action="/categories">
+  <div class="form-group">
+    <input name="category[title]" type="text" class="form-control" id="asdf" placeholder="Category Name">
+  </div>
+  <div class="form-group">
+    <textarea name="category[description]" class="form-control" placeholder="Category Description (Optional)"></textarea>
+  </div>
+  <input type="submit" class="btn btn-primary" value="Create Category">
+</form>
+
+{% endblock %}

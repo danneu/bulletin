@@ -6,9 +6,12 @@
                  [hiccup "1.0.5"]
                  [selmer "0.6.9"]
                  [org.clojure/java.jdbc "0.3.5"]
+                 [cheshire "5.3.1"]
                  [postgresql/postgresql "8.4-702.jdbc4"]
                  [prone "0.4.0"]
                  [environ "1.0.0"]
+                 [lib-noir "0.8.6"]
+                 [markdown-clj "0.9.47"]
                  [ring-server "0.3.1"]]
   :plugins [[lein-ring "0.8.10"]]
   :ring {:handler bulletin.handler/app

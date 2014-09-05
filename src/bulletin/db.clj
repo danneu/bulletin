@@ -2,7 +2,45 @@
   (:require [clojure.java.jdbc :as j]
             [clojure.java.io :as io]
             [clojure.string :as str]
+            [cheshire.core :as json]
+            [noir.util.crypt :as crypt]
             [bulletin.config :as config]))
+
+;; Convert json db values to/front clojure maps and vectors
+;; http://hiim.tv/clojure/2014/05/15/clojure-postgres-json/
+
+;; Maps
+(extend-protocol j/ISQLValue
+  clojure.lang.IPersistentMap
+  (sql-value [value]
+    (doto (org.postgresql.util.PGobject.)
+      (.setType "json")
+      (.setValue (json/encode value)))))
+
+(extend-protocol j/IResultSetReadColumn
+  org.postgresql.util.PGobject
+  (result-set-read-column [pgobj metadata idx]
+    (let [type  (.getType pgobj)
+          value (.getValue pgobj)]
+      (case type
+        "json" (json/decode value true)
+        value  ; Default
+        ))))
+
+;; Vectors
+(defn value-to-json-pgobject [value]
+  (doto (org.postgresql.util.PGobject.)
+    (.setType "json")
+    (.setValue (json/decode value))))
+
+(extend-protocol j/ISQLValue
+  clojure.lang.IPersistentMap
+  (sql-value [value] (value-to-json-pgobject value))
+
+  clojure.lang.IPersistentVector
+  (sql-value [value] (value-to-json-pgobject value)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def db-spec config/database-url)
 
@@ -12,6 +50,19 @@
 SELECT *
 FROM communities
 "])))
+
+;; Returns {..., :forum {...}}
+(defn find-post [post_id]
+  (j/with-db-connection [conn db-spec]
+    (j/query conn ["
+SELECT
+  p.*,
+  to_json(f.*) \"forum\"
+FROM posts p
+JOIN topics t ON p.topic_id = t.id
+JOIN forums f ON t.forum_id = f.id
+WHERE p.id = ?
+" post_id] :result-set-fn first)))
 
 (defn find-categories [community_id]
   (j/with-db-connection [conn db-spec]
@@ -29,6 +80,43 @@ SELECT *
 FROM forums f
 WHERE f.category_id IN (" (str/join "," category_ids) ")
 ")])))
+
+(defn update-post! [post-id text]
+  (j/with-db-connection [conn db-spec]
+    (j/query conn ["
+UPDATE posts
+SET text = ?, updated_at = NOW()
+WHERE id = ?
+RETURNING *
+" text post-id] :result-set-fn first)))
+
+(defn find-user [user_id]
+  (j/with-db-connection [conn db-spec]
+    (j/query conn ["
+SELECT
+  u.*,
+  to_json(array_agg(r.*)) \"roles\"
+FROM users u
+LEFT OUTER JOIN roles r ON u.id = r.user_id
+WHERE id = ?
+GROUP BY u.id
+" user_id]
+             ;; Convert :roles from [nil] to []
+             :result-set-fn (fn [users]
+                              (let [user (first users)]
+                                (when user
+                                  (update-in user
+                                             [:roles]
+                                             (partial remove nil?))))))))
+
+;; Case-insensitive username lookup
+(defn find-user-by-username [username]
+  (j/with-db-connection [conn db-spec]
+    (j/query conn ["
+SELECT *
+FROM users
+WHERE LOWER(username) = LOWER(?)
+" username] :result-set-fn first)))
 
 (defn create-category! [{:keys [community_id title description position]}]
   (j/with-db-connection [conn db-spec]
@@ -48,14 +136,81 @@ RETURNING *
 " category_id title description (or position 0)]
 :result-set-fn first)))
 
-(defn create-topic! [{:keys [forum_id title description user_id]}]
-  (j/with-db-connection [conn db-spec]
-    (j/query conn ["
-INSERT INTO topics (forum_id, title, user_id)
+(defn create-user! [{:keys [username email password]}]
+  (let [digest (crypt/encrypt password)]
+    (j/with-db-connection [conn db-spec]
+      (j/query conn ["
+INSERT INTO users (username, digest, email)
 VALUES (?, ?, ?)
 RETURNING *
-" forum_id title user_id]
-:result-set-fn first)))
+" username digest email] :result-set-fn first))))
+
+;; Returns String session_id
+(defn create-session! [user_id]
+  (let [session_id (java.util.UUID/randomUUID)
+        session (j/with-db-connection [conn db-spec]
+                  (j/query conn ["
+INSERT INTO sessions (id, user_id)
+VALUES (?, ?)
+RETURNING *
+" session_id user_id] :result-set-fn first))]
+    (str (:id session))))
+
+;; -- Keeping roleless version around in case I don't like it roles system
+;; (defn find-user-by-session-id [session_id]
+;;   (j/with-db-connection [conn db-spec]
+;;     (j/query conn ["
+;; SELECT u.*
+;; FROM users u
+;; WHERE u.id = (
+;;   SELECT s.user_id
+;;   FROM sessions s
+;;   WHERE s.id = ?::uuid
+;;     -- Sessions become invalid after 2 weeks
+;;     AND created_at >= (NOW() - INTERVAL '14 days')
+;;   )
+;; " session_id] :result-set-fn first)))
+
+(defn find-user-by-session-id [session_id]
+  (j/with-db-connection [conn db-spec]
+    (j/query conn ["
+SELECT
+  u.*,
+  to_json(array_agg(r.*)) \"roles\"
+FROM users u
+LEFT OUTER JOIN roles r ON u.id = r.user_id
+WHERE u.id = (
+  SELECT s.user_id
+  FROM sessions s
+  WHERE s.id = ?::uuid
+    -- Sessions become invalid after 2 weeks
+    AND created_at >= (NOW() - INTERVAL '14 days')
+  )
+GROUP BY u.id;
+" session_id]
+             ;; Since :roles will be `[nil]` if the user has no roles,
+             ;; we need to (remove nil? roles) so that empty seq is returned
+             :result-set-fn (fn [users]
+                              (let [user (first users)]
+                                (when user
+                                  (update-in user
+                                             [:roles]
+                                             (partial remove nil?))))))))
+
+; (find-user-by-session-id "ca394b06-b490-4c3e-a598-ce50fcf93bdc")
+
+;; Returns {:title _, ..., :posts [Post]}
+(defn create-topic! [{:keys [forum_id title description user_id text ip]}]
+  (j/with-db-connection [conn db-spec]
+    (let [topic (j/query conn ["INSERT INTO topics (forum_id, title, user_id)
+                                VALUES (?, ?, ?)
+                                RETURNING *;" forum_id title user_id]
+                         :result-set-fn first)
+          post (j/query conn [" INSERT INTO posts (topic_id, text, user_id, ip)
+                                VALUES (?, ?, ?, ?::inet)
+                                RETURNING *;" (:id topic) text user_id ip]
+                        :result-set-fn first)]
+      (assoc topic :posts [post]))))
 
 (defn create-community! [{:keys [name slug] :as attrs}]
   (j/with-db-connection [conn db-spec]
@@ -65,6 +220,22 @@ VALUES (?, ?)
 RETURNING *
 " name slug]
 :result-set-fn first)))
+
+(defn delete-sessions! [user_id]
+  (j/with-db-connection [conn db-spec]
+    (j/execute! conn ["
+DELETE FROM sessions
+WHERE user_id = ?
+" user_id])))
+
+(defn find-community [community_id]
+  (j/with-db-connection [conn db-spec]
+    (j/query conn ["
+SELECT *
+FROM communities
+WHERE id = ?
+" community_id]
+ :result-set-fn first)))
 
 ;; String -> Community | nil
 (defn find-community-by-slug [slug]
@@ -76,96 +247,124 @@ WHERE slug = ?
 " slug]
  :result-set-fn first)))
 
-(defn reset-db! []
+(defn find-forum [id]
   (j/with-db-connection [conn db-spec]
-    (j/execute! conn ["
-DROP TABLE IF EXISTS communities CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS categories CASCADE;
-DROP TABLE IF EXISTS topics CASCADE;
-DROP TABLE IF EXISTS forums CASCADE;
-DROP TABLE IF EXISTS posts CASCADE;
-"])
-    (j/execute! conn ["
-CREATE TABLE communities (
-  id          bigserial                  PRIMARY KEY,
-  title       text                       NOT NULL,
-  slug        text                       NOT NULL  UNIQUE,
-  created_at  timestamp with time zone   NOT NULL  DEFAULT CURRENT_TIMESTAMP
-);
+    (j/query conn ["
+SELECT
+  f.*,
+  to_json(c.*) category
+FROM forums f
+JOIN categories c ON f.category_id = c.id
+WHERE f.id = ?
+" id] :result-set-fn first)))
 
-CREATE TABLE users (
-  id            bigserial  PRIMARY KEY,
-  digest        text       NOT NULL,
-  -- Is there a way to ensure usernames and emails are unique at
-  -- community_id scope in db layer?
-  username      text       NOT NULL,
-  email         text       NOT NULL,
-  -- Global admins (staff) don't belong to a community
-  community_id  bigint  NULL  REFERENCES communities(id)  ON DELETE CASCADE,
-  created_at    timestamp with time zone   NOT NULL  DEFAULT CURRENT_TIMESTAMP
-);
+(defn find-forum-topics [forum-id]
+  (j/with-db-connection [conn db-spec]
+    (j/query conn ["
+SELECT
+  t.*,
+  to_json(u.*) \"user\",
+  to_json(p.*) \"latest_post\",
+  to_json(u2.*) \"latest_user\"
+FROM topics t
+JOIN users u ON t.user_id = u.id
+LEFT JOIN posts p ON p.id = t.latest_post_id
+LEFT JOIN users u2 ON p.user_id = u2.id
+WHERE t.forum_id = ?
+ORDER BY t.latest_post_id DESC
+" forum-id])))
 
-CREATE TABLE categories (
-  id           bigserial    PRIMARY KEY,
-  title        text      NOT NULL,
-  description  text      NULL,
-  position     bigint       NOT NULL,
-  community_id bigint       NOT NULL  REFERENCES communities(id)
-);
+(defn create-post! [{:keys [user_id topic_id text ip]}]
+  (j/with-db-connection [conn db-spec]
+    (j/query conn ["
+INSERT INTO posts (user_id, topic_id, text, ip)
+VALUES (?, ?, ?, ?::inet)
+RETURNING *
+" user_id topic_id text ip])))
 
-CREATE TABLE forums (
-  id                bigserial      PRIMARY KEY,
-  category_id       bigint         REFERENCES categories(id),
-  title             text        NOT NULL,
-  description       text        NULL,
-  position          bigint         NOT NULL,
-  topics_count      bigint         NOT NULL  DEFAULT 0,
-  posts_count       bigint         NOT NULL  DEFAULT 0
-);
+(defn find-topic [topic-id]
+  (j/with-db-connection [conn db-spec]
+    (j/query conn ["
+SELECT
+  t.*,
+  to_json(f.*) forum,
+  to_json(c.*) category
+FROM topics t
+JOIN forums f ON t.forum_id = f.id
+JOIN categories c ON f.category_id = c.id
+WHERE t.id = ?
+" topic-id] :result-set-fn first)))
 
-CREATE TABLE topics (
-  id                bigserial   PRIMARY KEY,
-  forum_id          bigint      NOT NULL
-                                REFERENCES forums(id)
-                                ON DELETE CASCADE,
-  user_id           bigint      NOT NULL
-                                REFERENCES users(id)
-                                ON DELETE CASCADE,
-  title             text        NOT NULL,
-  created_at        timestamp with time zone   NOT NULL  DEFAULT CURRENT_TIMESTAMP,
-  posts_count       bigint         NOT NULL  DEFAULT 0,
-  is_locked         boolean     NOT NULL  DEFAULT false,
-  is_hidden         boolean     NOT NULL  DEFAULT false,
-  is_sticky         boolean     NOT NULL  DEFAULT false
-);
+(defn find-topic-posts-paginated [topic-id current-user-id]
+  (j/with-db-connection [conn db-spec]
+    (j/query conn ["
+SELECT
+  p.*,
+  to_json(u.*) \"user\",
+  COUNT(likes.id) \"likes_count\",
+  array_agg(likes.user_id::bigint) @> Array[?::bigint] \"has_liked\",
+  array_agg(reports.user_id::bigint) @> Array[?::bigint] \"has_reported\"
+FROM posts p
+JOIN users u ON p.user_id = u.id
+LEFT JOIN likes ON p.id = likes.post_id
+LEFT JOIN reports ON p.id = reports.post_id
+WHERE p.topic_id = ?::bigint
+GROUP BY p.id, u.id
+ORDER BY p.created_at ASC
+LIMIT ?
+OFFSET ?
+" current-user-id
+  current-user-id
+  topic-id
+  10000000  ; limit (TODO)
+  0         ; offset (TODO)
+  ])))
 
-CREATE TABLE posts (
-  id               bigserial           PRIMARY KEY,
-  topic_id         bigint              NOT NULL  REFERENCES topics(id),
-  user_id          bigint              NOT NULL  REFERENCES users(id),
-  text             text             NOT NULL,
-  created_at       timestamp with time zone  NOT NULL  DEFAULT CURRENT_TIMESTAMP,
-  updated_at       timestamp with time zone  NULL,
-  ip               inet             NULL
-);
-
-INSERT INTO users (digest, username, email)
-VALUES ('secret', 'danneu', 'danneu@example.com');
-
+(defn reset-db! []
+  (let [reset-sql (slurp (io/resource "migrations/0_reset_db.sql"))]
+    (j/with-db-connection [conn db-spec]
+      ;; Rebuild DB
+      (j/execute! conn [reset-sql])
+      ;; Seed users
+      (create-user! {:username "danneu",  ; user 1
+                     :email "danneu@example.com",
+                     :password "secret"})
+      (create-user! {:username "foo",  ; user 2
+                     :email "foo@example.com",
+                     :password "secret"})
+      (create-user! {:username "member",  ; user 3
+                     :email "member@example.com",
+                     :password "secret"})
+      (create-user! {:username "smod",  ; user 4
+                     :email "smod@example.com",
+                     :password "secret"})
+      ;; Seed db
+      (j/execute! conn ["
 INSERT INTO communities (title, slug)
 VALUES ('foo', 'foo');
 INSERT INTO categories (title, description, community_id, position)
 VALUES ('Test Category', 'Test description', 1, 0);
 INSERT INTO forums (category_id, title, description, position)
-VALUES (1, 'Test forum', 'Desc', 0)
+VALUES (1, 'Test forum', 'Desc', 0);
+INSERT INTO topics (forum_id, title, user_id)
+VALUES (1, 'Test topic', 1);
+INSERT INTO posts (topic_id, user_id, text)
+VALUES (1, 1, 'Test post');
+
+-- Create global admin
+INSERT INTO roles (user_id, title)
+VALUES (1, 'admin');
+INSERT INTO roles (user_id, title, community_id)
+VALUES (2, 'supermod', 1);
+INSERT INTO roles (user_id, title, community_id)
+VALUES (4, 'supermod', 1);
 "])
-    (j/query conn ["
+      (map :table_name (j/query conn ["
 SELECT table_name
 FROM information_schema.tables
 WHERE table_schema = 'public'
 ORDER BY table_schema, table_name;
-"])
-))
+"]))
+      )))
 
 (reset-db!)

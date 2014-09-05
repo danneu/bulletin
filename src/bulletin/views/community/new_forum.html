@@ -1,0 +1,28 @@
+{% extends "bulletin/views/community/layout.html" %}
+{% block template %}
+
+<!-- Variables:
+     categories
+       {title, id}
+-->
+
+<h1>New Forum</h1>
+<form role="form" method="post" action="/forums">
+  <div class="form-group">
+    <select class="form-control" name="forum[category_id]">
+      <option value="-1">Choose Category</option>
+      {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.title }}</option>
+      {% endfor %}
+  </select>
+  </div>
+  <div class="form-group">
+    <input name="forum[title]" type="text" class="form-control" id="asdf" placeholder="Forum Name">
+  </div>
+  <div class="form-group">
+    <textarea name="forum[description]" class="form-control" placeholder="Forum description"></textarea>
+  </div>
+  <input type="submit" class="btn btn-primary" value="Create Forum">
+</form>
+
+{% endblock %}

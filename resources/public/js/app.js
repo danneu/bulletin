@@ -1,0 +1,4 @@
+
+$(function() {
+  $('#report-editor').markdown();
+});

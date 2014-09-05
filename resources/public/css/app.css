@@ -1,0 +1,138 @@
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.navbar {
+  margin-bottom: 20px;
+}
+
+.navbar-default {
+  background-color: transparent;
+  border: none;
+}
+
+/* On the homepage, add borders to the login/register tab panes
+   so that you can tell where the tab panes start and stop.
+ */
+
+.tab-content {
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+#admin-box {
+    margin-bottom: 20px;
+}
+
+
+/*
+    center our global 'powered by' footer. give it a vertical
+    margin to provide breathing room between the content of the page
+*/
+
+#global-footer {
+  text-align: center;
+  margin-top: 200px;
+}
+
+/*
+    Create global banner on community layout that links back to homepage.
+    Bump body down to give it some space
+*/
+
+body { margin-top: 10px; }
+#global-banner{
+  position: absolute;
+  background: black;
+  top: 0;
+  width: 100%;
+  color: white;
+}
+#global-banner a {
+  color: white;
+}
+
+/*
+     Remove backgorund and border on post footer panel. Go for a white clean look
+*/
+
+.post-panel .panel-footer {
+  background: none;
+  border: none;
+  /* pull post buttons closer to the edge to even it out */
+  padding-left: 10px;
+  padding-right: 10px
+}
+
+/*
+     Compress post meta header a lil bit. it's too tall by default
+ */
+
+.post-panel .panel-heading {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  /* pull post meta/buttons closer to the edge to even it out */
+  padding-left: 10px;
+  padding-right: 10px
+}
+
+/* Add my own .btn-gray to line up with closed/unclock topic
+   since .btn-default is white. modeled after label-default like the Closd
+   banner
+*/
+
+.btn-gray {
+  background-color: #999;
+  color: #fff;
+}
+
+/* neutralize the color of the ipaddress in the post */
+
+.post-ip {
+  color: #ccc
+}
+
+/* on www homepage, improve call to action with a jumbotron. clean it up iwth less gray */
+
+#jumbo {
+    background-color: transparent;
+}
+#jumbo .panel {
+  box-shadow: 0px 10px 10px rgba(0,0,0,0.10)
+}
+
+/*
+    #report-modal has too much margin and line action going on in it.
+    Remove some from the modal footer.
+ */
+
+#report-modal .modal-footer {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+#report-modal .modal-header {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+/*
+    When user clicks the notification btn to summon latest list of notifications
+    lemme fit a list group in there without padding n stuff
+ */
+
+#notification-popover {
+    min-width: 200px;
+}
+
+#notification-popover .popover-content {
+    padding: 2px 0;
+}
+
+#notification-popover .list-group {
+    margin-bottom: 0;
+}

@@ -1,0 +1,73 @@
+{% extends "bulletin/views/community/layout.html" %}
+{% block template %}
+
+<!-- variables:
+     current-community
+     topic
+     posts
+-->
+
+<ol class="breadcrumb">
+  <li>
+    <a href="/">Home</a>
+  </li>
+  <li class="">
+    {{ topic.category.title }}
+  </li>
+  <li>
+    <a href="/forums/{{topic.forum.id}}">{{topic.forum.title}}</a>
+  </li>
+</ol>
+
+<h1>{{ topic.title }}</h1>
+
+<!-- Posts list -->
+{% for post in posts %}
+<div class="post-panel panel panel-default" id="post-{{ post.id }}">
+  <!-- Panel heading -->
+  <div class="panel-heading clearfix">
+    <div class="pull-left">{{post.created_at|date:shortDateTime}}</div>
+    <!--<div style="margin-left: 5px; color: #bdbdbd" class="pull-left edited-marker" title=""></div>-->
+    <div class="pull-right">
+      <a href="/posts/{{ post.id }}" style="color: #bdbdbd;">
+        <span class="glyphicon glyphicon-link"></span>
+      </a>
+    </div>
+  </div>
+  <!-- Panel body -->
+  <div class="panel-body">
+    <div class="col-md-2 text-center">
+      <div class="post-username">
+        <a href="/users/{{ post.user.id }}">{{ post.user.username }}</a>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="post-body">
+        {{ post.html|safe }}
+      </div>
+    </div>
+  </div>
+  <!-- Panel footer -->
+  <div class="panel-footer clearfix">
+    <!-- IP address -->
+    {% if post.ip %}
+    <div class="pull-left post-ip" style="margin-left: 5px">{{post.ip}}</div>
+    {% endif %}
+    <!-- Reply button -->
+    <a href="" class="btn btn-default btn-xs pull-right post-reply-btn" post-id="{{ post.id }}" style="margin-left: 5px">Reply</a>
+    <!-- Edit button -->
+    <a href="/" class="btn btn-default btn-xs pull-right post-edit-btn" style="margin-left: 5px;" post-id={{post.id}}>Edit</a>
+  </div>
+</div>
+{% endfor %}
+
+<!-- New reply -->
+<h2>New Reply</h2>
+<form id="reply-form" role="form" method="post" action="/forums/{{topic.forum.id}}/topics/{{topic.id}}/posts">
+  <div class="form-group">
+    <textarea rows=10 name="post-text" class="form-control" placeholder="Click here and begin writing" data-provide="markdown"></textarea>
+  </div>
+  <input type="submit" class="btn btn-primary" value="Post Reply"></input>
+</form>
+
+{% endblock %}
