@@ -130,7 +130,8 @@
     (if (can/cannot? *current-user*
                      :create-category
                      {:community *current-community*})
-      {:status 403, :body "Can't let you create a category"}
+      (-> (redirect "/")
+          (assoc-in [:flash :message] ["danger" "You can't create categories"]))
       (p/render-file "bulletin/views/community/new_category.html"
                      {:current-user *current-user*
                       :current-community *current-community*})))
@@ -141,7 +142,8 @@
     (if (can/cannot? *current-user*
                      :create-forum
                      {:community *current-community*})
-      {:status 403, :body "Can't let you create a forum"}
+      (-> (redirect "/")
+          (assoc-in [:flash :message] ["danger" "You can't create forums"]))
       (let [categories (db/find-categories (:id *current-community*))]
         (p/render-file "bulletin/views/community/new_forum.html"
                        {:current-user *current-user*
@@ -154,7 +156,8 @@
     (if (can/cannot? *current-user*
                      :create-forum
                      {:community *current-community*})
-      {:status 403, :body "Can't let you create a forum"}
+      (-> (redirect "/")
+          (assoc-in [:flash :message] ["danger" "You can't create forums"]))
       (let [title (-> req :params :forum :title)
             description (-> req :params :forum :description)
             ;; FIXME: Fails if client sends non-integer string
@@ -181,7 +184,8 @@
     (if (can/cannot? *current-user*
                      :create-category
                      {:community *current-community*})
-      {:status 403, :body "Can't let you create a category"}
+      (-> (redirect "/")
+          (assoc-in [:flash :message] ["danger" "You can't create categories"]))
       (let [title (-> req :params :category :title)
             description (-> req :params :category :description)]
         ;; TODO: Allow user to change position
@@ -222,7 +226,8 @@
                        :create-post
                        {:community *current-community*
                         :forum forum})
-        {:status 403, :body "Can't let you create a post"}
+        (-> (redirect "/")
+            (assoc-in [:flash :message] ["danger" "You can't post here"]))
         (let [post-text (get-in req [:params :post-text])
               topic-id (Integer/parseInt topic-id)
               ip (:remote-addr req)
@@ -242,7 +247,8 @@
                        :read-forum
                        {:community *current-community*
                         :forum forum})
-        {:status 403, :body "Can't let you read this forum"}
+        (-> (redirect "/")
+            (assoc-in [:flash :message] ["danger" "You can't read this forum"]))
         (let [topics (db/find-forum-topics forum-id)
               can-create-topic? (can/can?
                                  *current-user*
@@ -265,7 +271,8 @@
                        :create-topic
                        {:community *current-community*
                         :forum forum})
-        {:status 403, :body "Can't let you create a topic"}
+        (-> (redirect "/")
+            (assoc-in [:flash :message] ["danger" "You can't create a topic here"]))
         (let [title (-> req :params :topic :title)
               text (-> req :params :topic :text)
               ip (:remote-addr req)]
@@ -327,7 +334,8 @@
                        :read-topic
                        {:community *current-community*
                         :forum (:forum topic)})
-        {:status 403, :body "Can't let you read this topic"}
+        (-> (redirect "/")
+            (assoc-in [:flash :message] ["danger" "You can't read this topic"]))
         ;; Render the markdown for each post on the fly
         ;; FIXME: I need to render markdown like `<http://google.com>` without
         ;;        allowing xss `<script>...` and other arbitrary html
@@ -395,7 +403,8 @@
   ;;
   (POST "/communities" req
     (if (can/cannot? *current-user* :create-community {})
-      {:status 403, :body "Can't let you create a community"}
+      (-> (redirect "/")
+          (assoc-in [:flash :message] ["danger" "You can't create communities"]))
       (let [params (select-keys (:params req) [:name :slug])
             ;; TODO: Validate params
             community (db/create-community! {:name (:name params)
