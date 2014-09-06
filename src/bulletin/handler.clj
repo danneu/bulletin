@@ -418,6 +418,7 @@
       ;;        response))))
       (wrap-method-override)
       (handler/site {:session {:cookie-name "bulletin-session"
+                               :cookie-attrs {:domain ".bulletin.dev"}
                                :store (cookie-store
                                        ;; 16-byte secret
                                        {:key "abcdefghijklmnop"})}})
