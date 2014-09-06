@@ -432,18 +432,31 @@
                                                  (str/lower-case method-string)))
                  request)))))
 
+;; TODO: This doesn't actually work yet
+;; I want to be able to apply this to arbitrary middleware in the pipeline
+(defn ignore-assets [middleware]
+  (fn [handler]
+    (fn [request]
+      (println request)
+      (if (re-find #".js$|.css$|" (:uri request))
+        (handler request)
+        ((middleware handler) request)))))
+
+(defn wrap-echo [handler]
+  (fn [request]
+    (println "\n=========================\nRequest:")
+    ;(pprint request)
+    (println "flash: " (:flash request))
+    (let [response (handler request)]
+      (println "\nResponse:" (dissoc response :body))
+      response)))
+
 (def app
   (-> app-routes ;(routes home-routes app-routes)
       (wrap-current-user)
       (wrap-current-community)
-      ;; ((fn [handler]
-      ;;    (fn [request]
-      ;;      (println "\nRequest:")
-      ;;      (pprint request)
-      ;;      (let [response (handler request)]
-      ;;        (println "\nResponse:" (dissoc response :body))
-      ;;        response))))
       (wrap-method-override)
+      (wrap-echo)
       (handler/site {:session {:cookie-name "bulletin-session"
                                :cookie-attrs {:domain ".bulletin.dev"}
                                :store (cookie-store
