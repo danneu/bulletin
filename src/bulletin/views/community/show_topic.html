@@ -54,7 +54,9 @@
     <div class="pull-left post-ip" style="margin-left: 5px">{{post.ip}}</div>
     {% endif %}
     <!-- Reply button -->
-    <a href="" class="btn btn-default btn-xs pull-right post-reply-btn" post-id="{{ post.id }}" style="margin-left: 5px">Reply</a>
+    <a href="" class="btn btn-default btn-xs pull-right post-reply-btn" post-id="{{ post.id }}" style="margin-left: 5px"
+       {%if current-user.can-create-post?%}{%else%}disabled{%endif%}
+       >Reply</a>
     <!-- Edit button -->
     <a href="/"
        class="btn btn-default btn-xs pull-right post-edit-btn"
