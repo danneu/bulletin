@@ -79,7 +79,8 @@
   ;; Registration Page
   ;;
   (GET "/register" []
-    (p/render-file "bulletin/views/community/register.html" {}))
+    (p/render-file "bulletin/views/community/register.html"
+                   {:current-community *current-community*}))
   ;;
   ;; Show user
   ;;
