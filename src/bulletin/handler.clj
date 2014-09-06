@@ -81,6 +81,17 @@
   (GET "/register" []
     (p/render-file "bulletin/views/community/register.html" {}))
   ;;
+  ;; Show user
+  ;;
+  (GET "/users/:user-id" [user-id :as req]
+    (let [user-id (Integer/parseInt user-id)
+          user (db/find-user user-id)]
+      (p/render-file "bulletin/views/community/show_user.html"
+                     {:current-community *current-community*
+                      :current-user *current-user*
+                      :user user
+                      :req req})))
+  ;;
   ;; Create user
   ;;
   (POST "/users" req
