@@ -42,24 +42,30 @@
           <a class="navbar-brand" href="/">Bulletin <span class="label label-default">Beta</span></a>
         </div>
 
-        <!-- When not logged in -->
-        <form class="navbar-form navbar-right"
-              action="/sessions"
-              method="post">
-          <div class="form-group">
-            <input name="creds[username]"
-                   type="text"
-                   class="form-control"
-                   placeholder="Username">
-          </div>
-          <div class="form-group">
-            <input name="creds[password]"
-                   type="password"
-                   class="form-control"
-                   placeholder="Password">
-          </div>
-          <button type="submit" class="btn btn-default">Submit</button>
-        </form>
+        {% if current-user.id %}
+          <p class="navbar-right navbar-text">
+            Logged in as {{current-user.username}}. TODO: Reuse community navbar
+          </p>
+        {% else %}
+          <!-- When not logged in -->
+          <form class="navbar-form navbar-right"
+                action="/sessions"
+                method="post">
+            <div class="form-group">
+              <input name="creds[username]"
+                     type="text"
+                     class="form-control"
+                     placeholder="Username">
+            </div>
+            <div class="form-group">
+              <input name="creds[password]"
+                     type="password"
+                     class="form-control"
+                     placeholder="Password">
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+          </form>
+        {% endif %}
 
       </div>
     </div>

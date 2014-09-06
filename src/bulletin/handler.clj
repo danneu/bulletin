@@ -362,7 +362,8 @@
       ;; www homepage
       (let [communities (db/find-communities)]
         (p/render-file "bulletin/views/homepage.html"
-                       {:communities communities}))))
+                       {:communities communities
+                        :current-user *current-user*}))))
   ;;
   ;; Create community
   ;;
