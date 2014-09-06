@@ -367,10 +367,21 @@
             categories (for [category categories
                              :let [category-id (:id category)]]
                          ;; Default to empty collection instead of nil
-                         (assoc category :forums (get grouped-forums category-id [])))]
+                         (assoc category :forums (get grouped-forums category-id [])))
+            can-create-category? (can/can? *current-user*
+                                           :create-category
+                                           {:community *current-community*})
+            can-create-forum? (can/can? *current-user*
+                                           :create-forum
+                                           {:community *current-community*})
+            ]
         (p/render-file "bulletin/views/community/homepage.html"
                        {:current-community *current-community*
-                        :current-user *current-user*
+                        :current-user (-> *current-user*
+                                          (assoc :can-create-category?
+                                            can-create-category?)
+                                          (assoc :can-create-forum?
+                                            can-create-forum?))
                         :categories categories
                         :req req}))
       ;; www homepage

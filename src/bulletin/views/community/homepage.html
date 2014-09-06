@@ -23,6 +23,13 @@
   </ul>
 {% endfor %}
 
-<div class="text-center"><a href="/categories/new" class="btn btn-default" style="width: 200px">New Category</a><a href="/forums/new" class="btn btn-default" style="width: 200px; margin-left: 5px;">New Forum</a></div>
+<div class="text-center">
+  <a href="/categories/new" class="btn btn-default" style="width: 200px"
+     {%if current-user.can-create-category?%}{%else%}disabled{%endif%}
+     >New Category</a>
+  <a href="/forums/new" class="btn btn-default" style="width: 200px; margin-left: 5px;"
+     {%if current-user.can-create-forum?%}{%else%}disabled{%endif%}
+     >New Forum</a>
+</div>
 
 {% endblock %}
