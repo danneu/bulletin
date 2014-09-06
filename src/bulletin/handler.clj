@@ -108,7 +108,8 @@
   (DELETE "/sessions" _
     (when *current-user*
       (db/delete-sessions! (:id *current-user*)))
-    (redirect "/"))
+    (-> (redirect "/")
+        (assoc :session nil)))
   ;;
   ;; New category page
   ;;
