@@ -40,6 +40,9 @@
       <div class="post-username">
         <a href="/users/{{ post.user.id }}">{{ post.user.username }}</a>
       </div>
+      <!-- TODO: Extract inline style -->
+      <div style="height:50px;width:50px;background-color:{{post.user.hex-color}};margin:0 auto;margin-top:10px;border-radius:50%">
+      </div>
     </div>
     <div class="col-md-10">
       <div class="post-body">

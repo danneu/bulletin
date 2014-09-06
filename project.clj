@@ -11,6 +11,9 @@
                  [prone "0.4.0"]
                  [environ "1.0.0"]
                  [lib-noir "0.8.6"]
+                 ;; Using this to generate avatar hex-color, but I can probably
+                 ;; use selmer filter instead, so remember to remove
+                 [commons-codec "1.8"]
                  [markdown-clj "0.9.47"]
                  [ring-server "0.3.1"]]
   :plugins [[lein-ring "0.8.10"]]

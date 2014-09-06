@@ -20,7 +20,18 @@
             [bulletin.cancan :as can]
             [selmer.parser :as p]
             [bulletin.db :as db]
-            [markdown.core :as markdown]))
+            [markdown.core :as markdown])
+  ;; Using this to generate avatar hex-color, but I can probably
+  ;; use selmer filter instead, so remember to remove
+  (:import [org.apache.commons.codec.binary Hex]))
+
+;; TODO: Extract somewhere or implement via selmer filter
+(defn ->hex-color [s]
+  (->> (.digest (java.security.MessageDigest/getInstance "md5") (.getBytes s))
+       (Hex/encodeHexString)
+       (take 6)
+       (str/join "")
+       (str "#")))
 
 ;; TODO: Move these to their own ns that I can refer when I need *current-community*
 (def ^:dynamic *current-community* nil)
@@ -348,16 +359,19 @@
                                              :update-post
                                              {:community *current-community*
                                               :post post})]]
-                      (assoc post :html html))
+                      (-> post
+                          (assoc :html html)
+                          (assoc-in [:user :hex-color]
+                                    (->hex-color (:username (:user post))))))
               can-create-post? (can/can? *current-user*
                                          :create-post
                                          {:community *current-community*
                                           :topic topic})]
           (p/render-file "bulletin/views/community/show_topic.html"
                          {:current-community *current-community*
-                          :current-user (assoc *current-user*
-                                          :can-create-post?
-                                          can-create-post?)
+                          :current-user (-> *current-user*
+                                            (assoc :can-create-post?
+                                              can-create-post?))
                           :topic topic
                           :posts posts})))))
   ;;
