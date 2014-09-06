@@ -109,7 +109,8 @@
     (when *current-user*
       (db/delete-sessions! (:id *current-user*)))
     (-> (redirect "/")
-        (assoc :session nil)))
+        (assoc :session nil)
+        (assoc-in [:flash :message] ["success" "Successfully logged out"])))
   ;;
   ;; New category page
   ;;
@@ -196,7 +197,8 @@
           ;; Log the user in
           (let [session_id (db/create-session! (:id user))]
             (-> (redirect "/")
-                (assoc :session {:session_id session_id})))))))
+                (assoc :session {:session_id session_id})
+                (assoc-in [:flash :message] ["success" "Successfully logged in"])))))))
   ;;
   ;; Create post
   ;;
@@ -341,7 +343,7 @@
   ;;
   ;; Homepage
   ;;
-  (GET "/" []
+  (GET "/" req
     (if *current-community*
       ;; Community homepage
       (let [categories (db/find-categories (:id *current-community*))
@@ -358,7 +360,8 @@
         (p/render-file "bulletin/views/community/homepage.html"
                        {:current-community *current-community*
                         :current-user *current-user*
-                        :categories categories}))
+                        :categories categories
+                        :req req}))
       ;; www homepage
       (let [communities (db/find-communities)]
         (p/render-file "bulletin/views/homepage.html"

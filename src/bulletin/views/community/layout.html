@@ -90,11 +90,11 @@
     <div class="container">
 
       <!-- Alert message -->
-      <!-- {{? it.this.flash && it.this.flash.message}} -->
-      <!--   <div class="alert alert-{{= it.this.flash.message[0]}}"> -->
-      <!--     {{= it.this.flash.message[1]}} -->
-      <!--   </div> -->
-      <!-- {{?}} -->
+      {% if req.flash.message %}
+        <div class="alert alert-{{req.flash.message|first}}">
+          {{req.flash.message|last}}
+        </div>
+      {% endif %}
 
       <!-- Start content -->
       {% block template %}{% endblock %}
