@@ -361,6 +361,7 @@
                                               :post post})]]
                       (-> post
                           (assoc :html html)
+                          (assoc :can-update? can-update?)
                           (assoc-in [:user :hex-color]
                                     (->hex-color (:username (:user post))))))
               can-create-post? (can/can? *current-user*

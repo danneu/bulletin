@@ -128,8 +128,7 @@
         ;; target includes :post
         :update-post (or
                       ;; Members can update a post if it's theirs
-                      (and (= (:user_id (:post target))
-                              (:id user))))
+                      (and (= (:user_id (:post target)) (:id user))))
         ;;;
         ;;; Destroy
         ;;;
