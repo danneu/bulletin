@@ -361,6 +361,18 @@
                           :topic topic
                           :posts posts})))))
   ;;
+  ;; Show post (html - use /api/post via ajax)
+  ;;
+  ;; This permalink will redirect to the post within the topic
+  ;; to the correct paginated topic page according to user authorization.
+  ;; For ex: since some users can see deleted posts, pagination isn't the
+  ;; same for all users.
+  (GET "/posts/:post-id" [post-id]
+    (let [post-id (Integer/parseInt post-id)
+          ;post (db/find-post post-id)
+          ]
+      "TODO"))
+  ;;
   ;; Homepage
   ;;
   (GET "/" req
