@@ -93,6 +93,21 @@
     (p/render-file "bulletin/views/community/register.html"
                    {:current-community *current-community*}))
   ;;
+  ;; Edit user page
+  ;;
+  ;; TODO: Allow admin to attach mods to forums
+  (GET "/users/:user-id/edit" [user-id :as req]
+    (let [user-id (Integer/parseInt user-id)
+          user (db/find-user user-id)]
+      (p/render-file "bulletin/views/community/edit_user.html"
+                     {:current-community *current-community*
+                      :current-user *current-user*
+                      ;; TODO: Somehow indicate global admins
+                      :role (or (first (can/get-comm-roles user *current-community*))
+                                "member")
+                      :user user
+                      :req req})))
+  ;;
   ;; Show user
   ;;
   (GET "/users/:user-id" [user-id :as req]
