@@ -101,6 +101,9 @@
       (p/render-file "bulletin/views/community/show_user.html"
                      {:current-community *current-community*
                       :current-user *current-user*
+                      ;; TODO: Somehow indicate global admins
+                      :role (or (first (can/get-comm-roles user *current-community*))
+                                "member")
                       :user user
                       :req req})))
   ;;
