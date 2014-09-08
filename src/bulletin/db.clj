@@ -72,6 +72,18 @@ FROM categories
 WHERE community_id = ?
 " community_id])))
 
+(defn find-community-staff [community_id]
+  (j/with-db-connection [conn db-spec]
+    (j/query conn ["
+SELECT
+  r.*,
+  u.username,
+  to_json(u.*) \"user\"
+FROM roles r
+JOIN users u ON r.user_id = u.id
+WHERE r.community_id = ?
+" community_id])))
+
 ;; Returns [Forum]
 (defn find-forums [category_ids]
   (j/with-db-connection [conn db-spec]
@@ -380,20 +392,27 @@ OFFSET ?
             cat2 (create-category! {:community_id (:id com2)
                                     :title "Category 2"
                                     :description "Category 2 description"})
-            f1 (create-forum! {:category_id (:id cat1)
+            f1-1 (create-forum! {:category_id (:id cat1)
                                :title "Forum 1"
                                :description "Forum 1 description"})
-            f2 (create-forum! {:category_id (:id cat2)
+            f1-2 (create-forum! {:category_id (:id cat1)
                                :title "Forum 2"
                                :description "Forum 2 description"})
-            t1 (create-topic! {:forum_id (:id f1)
+            f2-1 (create-forum! {:category_id (:id cat2)
+                               :title "Forum 2"
+                               :description "Forum 2 description"})
+            t1 (create-topic! {:forum_id (:id f1-1)
                                :title "Topic 1"
                                :user_id 1
                                :text "hello world"})
-            t2 (create-topic! {:forum_id (:id f2)
+            t2 (create-topic! {:forum_id (:id f2-1)
                               :title "Topic 1"
                               :user_id 1
                                :text "hello world"})
+            _ (create-topic! {:forum_id (:id f1-2)
+                              :title "My Topic"
+                              :user_id 1
+                              :text "hello world"})
             ])
 
       (j/execute! conn ["
@@ -410,15 +429,21 @@ VALUES (3, 'admin', 2);
 "])
       (j/execute! conn ["
 INSERT INTO roles (user_id, title, community_id)
-VALUES (4, 'smod', 1);
+VALUES (4, 'supermod', 1);
 "])
       (j/execute! conn ["
 INSERT INTO roles (user_id, title, community_id)
-VALUES (5, 'smod', 2);
+VALUES (5, 'supermod', 2);
 "])
+
+      ;; user 6 is mod of comm1-f1 and comm1-f2
       (j/execute! conn ["
 INSERT INTO roles (user_id, title, community_id, forum_id)
 VALUES (6, 'mod', 1, 1);
+"])
+      (j/execute! conn ["
+INSERT INTO roles (user_id, title, community_id, forum_id)
+VALUES (6, 'mod', 1, 2);
 "])
       (j/execute! conn ["
 INSERT INTO roles (user_id, title, community_id, forum_id)
@@ -430,10 +455,6 @@ VALUES (7, 'mod', 1, 2);
 -- Create global admin
 INSERT INTO roles (user_id, title)
 VALUES (1, 'admin');
-INSERT INTO roles (user_id, title, community_id)
-VALUES (2, 'supermod', 1);
-INSERT INTO roles (user_id, title, community_id)
-VALUES (4, 'supermod', 1);
 "])
       (map :table_name (j/query conn ["
 SELECT table_name
@@ -442,3 +463,5 @@ WHERE table_schema = 'public'
 ORDER BY table_schema, table_name;
 "]))
       )))
+
+(reset-db!)

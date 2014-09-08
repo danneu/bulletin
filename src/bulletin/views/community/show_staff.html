@@ -1,0 +1,53 @@
+
+{% extends "bulletin/views/community/layout.html" %}
+{% block template %}
+
+<!-- variables:
+     current-community
+     topic
+     posts
+-->
+
+<ol class="breadcrumb">
+  <li>
+    <a href="/">Home</a>
+  </li>
+  <li class="active">
+    Staff
+  </li>
+</ol>
+
+<div class="page-header">
+  <h1>Community Staff</h1>
+</div>
+
+<h4>Community Admins</h4>
+<ul>
+  {% for user in comm-admins %}
+    <li>{{user.username}}</li>
+  {% endfor %}
+</ul>
+
+<h4>Super Mods</h4>
+{% if smods|count-is:0 %}
+  -- None --
+{% else %}
+  <ul>
+    {% for user in smods %}
+      <li>{{user.username}}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<h4>Mods</h4>
+{% if mods|count-is:0 %}
+  -- None --
+{% else %}
+  <ul>
+    {% for user in mods %}
+      <li>{{user.username}}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% endblock %}

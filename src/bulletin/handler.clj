@@ -112,6 +112,24 @@
                       :req req
                       :config config/config})))
   ;;
+  ;; Show community staff
+  ;;
+  (GET "/staff" []
+    (let [staff (db/find-community-staff (:id *current-community*))
+          comm-admins (filter #(= "admin" (:title %)) staff)
+          smods (filter #(= "supermod" (:title %)) staff)
+          mods (->> (filter #(= "mod" (:title %)) staff)
+                   (map :user)
+                   (into #{}))]
+      (p/render-file "bulletin/views/community/show_staff.html"
+                     {:current-community *current-community*
+                      :current-user *current-user*
+                      :config config/config
+                      ;; roles
+                      :comm-admins comm-admins
+                      :smods smods
+                      :mods mods})))
+  ;;
   ;; Show user
   ;;
   (GET "/users/:user-id" [user-id :as req]
