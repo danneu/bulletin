@@ -16,6 +16,13 @@
           {{ forum.topics_count }} topics<br>{{ forum.posts_count }} posts
         </div>
         <div class="col-sm-2">
+          <a href="">Latest post</a>
+          by
+          <a href="/users/{{topic.latest_user.id}}">
+            {{forum.latest_user.username}}
+          </a>
+          <br>
+          {{forum.latest-post.created_at|date:shortDateTime}}
         </div>
       </div>
     </li>

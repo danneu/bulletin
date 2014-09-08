@@ -88,9 +88,17 @@ WHERE r.community_id = ?
 (defn find-forums [category_ids]
   (j/with-db-connection [conn db-spec]
     (j/query conn [(str "
-SELECT *
+SELECT
+ f.*,
+ to_json(p.*) latest_post,
+ to_json(t.*) latest_topic,
+ to_json(u.*) latest_user
 FROM forums f
+LEFT OUTER JOIN posts p ON f.latest_post_id = p.id
+LEFT OUTER JOIN topics t ON t.id = p.topic_id
+LEFT OUTER JOIN users u ON u.id = p.user_id
 WHERE f.category_id IN (" (str/join "," category_ids) ")
+ORDER BY position
 ")])))
 
 (defn update-post! [post-id text]
