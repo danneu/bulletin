@@ -290,7 +290,8 @@
                                      :topic_id topic-id
                                      :text post-text
                                      :ip ip})]
-          (redirect (str "/forums/" forum-id "/topics/" topic-id))))))
+          (-> (redirect (str "/forums/" forum-id "/topics/" topic-id))
+              (assoc-in [:flash :message] ["success" "Successfully created post"]))))))
   ;;
   ;; Show forum
   ;;
@@ -381,7 +382,7 @@
   ;;
   ;; Show topic
   ;;
-  (GET "/forums/:forum-id/topics/:topic-id" [forum-id topic-id]
+  (GET "/forums/:forum-id/topics/:topic-id" [forum-id topic-id :as req]
     (let [forum-id (Integer/parseInt forum-id)
           topic-id (Integer/parseInt topic-id)
           topic (db/find-topic topic-id)]
@@ -412,6 +413,7 @@
                                               can-create-post?))
                           :topic topic
                           :posts posts
+                          :req req
                           :config config/config})))))
   ;;
   ;; Show post (html - use /api/post via ajax)
