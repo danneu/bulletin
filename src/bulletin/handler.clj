@@ -484,8 +484,7 @@
 (defn ignore-assets [middleware]
   (fn [handler]
     (fn [request]
-      (println request)
-      (if (re-find #".js$|.css$" (:uri request))
+      (if (re-find #"\.js$|\.css$|\.map$|\.woff$" (:uri request))
         (handler request)
         ((middleware handler) request)))))
 
@@ -500,8 +499,8 @@
 
 (def app
   (-> app-routes ;(routes home-routes app-routes)
-      (wrap-current-user)
-      (wrap-current-community)
+      ((ignore-assets wrap-current-user))
+      ((ignore-assets wrap-current-community))
       (wrap-method-override)
       ((ignore-assets wrap-echo))
       (handler/site {:session {:cookie-name "bulletin-session"
