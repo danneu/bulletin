@@ -493,8 +493,7 @@
                                                  (str/lower-case method-string)))
                  request)))))
 
-;; TODO: This doesn't actually work yet
-;; I want to be able to apply this to arbitrary middleware in the pipeline
+;; TODO: Write a regexp that catches all assets in one go
 (defn ignore-assets [middleware]
   (fn [handler]
     (fn [request]
