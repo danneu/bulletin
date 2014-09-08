@@ -13,9 +13,8 @@
                  [http-kit "2.1.16"]
                  [environ "1.0.0"]
                  [lib-noir "0.8.6"]
-                 ;; Using this to generate avatar hex-color, but I can probably
-                 ;; use selmer filter instead, so remember to remove
-                 [commons-codec "1.8"]
+                 ;; Hash library I use for generating avatar hex colors from unames
+                 [pandect "0.3.4"]
                  [ring-server "0.3.1"]]
   :plugins [[lein-ring "0.8.10"]]
   :ring {:handler bulletin.handler/app
