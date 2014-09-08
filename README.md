@@ -41,5 +41,7 @@ The website should now be running on `http://localhost:3000`.
 - I'm used to using Hiccup for templating which makes it trivial to share my cancan.clj between routes and templates. However, this is my first time using Selmer and so far my approach of shoehorning `can-*-?` keys into random objects has been ugly and feels so ad-hoc.
 - I really need to document things like what `*current-user*` actually looks like. What kind of things can get assoc'd to it. Etc.
 - Reuse views/community layout on www homepage
+- Add profiling per route
+- Add logging
 
 And much much more...
