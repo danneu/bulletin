@@ -442,5 +442,3 @@ WHERE table_schema = 'public'
 ORDER BY table_schema, table_name;
 "]))
       )))
-
-(reset-db!)

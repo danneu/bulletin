@@ -15,6 +15,7 @@
             [bulletin.config :as config]
             [ring.util.response :refer [redirect]]
             [clojure.pprint :refer [pprint]]
+            [org.httpkit.server :refer [run-server]]
             ;; To be extracted
             [noir.util.crypt :as crypt]
             [bulletin.cancan :as can]
@@ -22,7 +23,8 @@
             [bulletin.db :as db])
   ;; Using this to generate avatar hex-color, but I can probably
   ;; use selmer filter instead, so remember to remove
-  (:import [org.apache.commons.codec.binary Hex]))
+  (:import [org.apache.commons.codec.binary Hex])
+  (:gen-class))
 
 ;; TODO: Extract somewhere or implement via selmer filter
 (defn ->hex-color [s]
@@ -511,3 +513,7 @@
       (wrap-base-url)
       (wrap-reload)
       (prone/wrap-exceptions)))
+
+(defn -main [& args]
+  (run-server #'app {:port config/port})
+  (println "Bulletin started on" config/port))
