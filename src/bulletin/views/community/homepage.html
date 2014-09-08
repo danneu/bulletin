@@ -22,7 +22,9 @@
             {{forum.latest_user.username}}
           </a>
           <br>
-          {{forum.latest-post.created_at|date:shortDateTime}}
+          <span class="timeago" title="{{forum.latest_post.created_at}}">
+            {{forum.latest_post.created_at}}
+          </span>
         </div>
       </div>
     </li>

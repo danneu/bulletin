@@ -47,7 +47,10 @@
     <a href="http://{{community.slug}}.{{config.app-domain}}">
       {{ community.title }}
     </a>
-    &mdash; {{ community.created_at|date:shortDateTime }}
+    &mdash;
+    <span class="timeago" title="{{community.created_at}}">
+      {{community.created_at}}
+    </span>
   </li>
   {% endfor %}
 </ul>

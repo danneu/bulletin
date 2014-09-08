@@ -27,7 +27,8 @@
       <div class="col-md-8">
         <a href="/forums/{{ forum.id }}/topics/{{ topic.id }}">{{ topic.title }}</a>
         <br>
-        by {{ topic.user.username }}, {{ topic.created_at|date:shortDateTime}}
+        by {{ topic.user.username }},
+        <span class="timeago" title="{{topic.created_at}}">{{topic.created_at|date:shortDateTime}}</span>
       </div>
       <div class="col-md-2">{{ topic.posts_count }} posts</div>
       <!-- Latest post -->
@@ -38,7 +39,9 @@
           {{topic.latest_user.username}}
         </a>
         <br>
-        {{topic.latest-post.created_at|date:shortDateTime}}
+        <span class="timeago" title="{{topic.latest_post.created_at}}">
+          {{topic.latest_post.created_at}}
+        </span>
       </div>
     </div>
   </li>
