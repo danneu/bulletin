@@ -19,8 +19,7 @@
             [noir.util.crypt :as crypt]
             [bulletin.cancan :as can]
             [selmer.parser :as p]
-            [bulletin.db :as db]
-            [markdown.core :as markdown])
+            [bulletin.db :as db])
   ;; Using this to generate avatar hex-color, but I can probably
   ;; use selmer filter instead, so remember to remove
   (:import [org.apache.commons.codec.binary Hex]))
@@ -365,20 +364,13 @@
                         :forum (:forum topic)})
         (-> (redirect "/")
             (assoc-in [:flash :message] ["danger" "You can't read this topic"]))
-        ;; Render the markdown for each post on the fly
-        ;; FIXME: I need to render markdown like `<http://google.com>` without
-        ;;        allowing xss `<script>...` and other arbitrary html
         (let [posts (for [post (db/find-topic-posts-paginated topic-id 1)
-                          :let [html (-> (:text post)
-                                         ;; FIXME: (escape-html)
-                                         (markdown/md-to-html-string))
-                                can-update? (can/can?
+                          :let [can-update? (can/can?
                                              *current-user*
                                              :update-post
                                              {:community *current-community*
                                               :post post})]]
                       (-> post
-                          (assoc :html html)
                           (assoc :can-update? can-update?)
                           (assoc-in [:user :hex-color]
                                     (->hex-color (:username (:user post))))))
