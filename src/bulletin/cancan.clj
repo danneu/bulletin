@@ -141,7 +141,7 @@
         :delete-topic false
         :delete-user false
         ;;; Default to false since this is a whitelist
-        (do (throw (ex-info "Unhandled can? action" {:user user
+        (do #_(throw (ex-info "Unhandled can? action" {:user user
                                                      :action action
                                                      :target target}))
             false)))))

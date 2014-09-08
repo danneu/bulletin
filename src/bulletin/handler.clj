@@ -85,7 +85,9 @@
   ;;
   (GET "/reset-db" []
     (if (can/can? *current-user* :reset-db {})
-      (db/reset-db!)
+      (do (db/reset-db!)
+          (-> (redirect (str "//www." config/app-domain))
+              (assoc-in [:flash :message] ["success" "Successfully reset database"])))
       {:status 403, :body "Can't let you reset the db"}))
   ;;
   ;; Registration Page
