@@ -467,8 +467,10 @@
                                      :description "This is an example forum"})
             topic (db/create-topic! {:forum_id (:id forum)
                                      :title "Test Topic"
-                                     :user_id 1})]
-        (pr-str community))))
+                                     :user_id 1
+                                     :text "Test Post"})]
+        (-> (redirect (str "//" (:slug community) "." config/app-domain))
+            (assoc-in [:flash :message] ["success" "Successfully create community"])))))
   ;;
   ;; List communities
   ;;
