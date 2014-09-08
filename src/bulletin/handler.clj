@@ -485,14 +485,14 @@
   (fn [handler]
     (fn [request]
       (println request)
-      (if (re-find #".js$|.css$|" (:uri request))
+      (if (re-find #".js$|.css$" (:uri request))
         (handler request)
         ((middleware handler) request)))))
 
 (defn wrap-echo [handler]
   (fn [request]
     (println "\n=========================\nRequest:")
-    ;(pprint request)
+    (pprint request)
     (println "flash: " (:flash request))
     (let [response (handler request)]
       (println "\nResponse:" (dissoc response :body))
@@ -503,7 +503,7 @@
       (wrap-current-user)
       (wrap-current-community)
       (wrap-method-override)
-      (wrap-echo)
+      ((ignore-assets wrap-echo))
       (handler/site {:session {:cookie-name "bulletin-session"
                                :cookie-attrs {:domain ".bulletin.dev"}
                                :store (cookie-store
@@ -511,5 +511,4 @@
                                        {:key "abcdefghijklmnop"})}})
       (wrap-base-url)
       (wrap-reload)
-      (prone/wrap-exceptions)
-      ))
+      (prone/wrap-exceptions)))
