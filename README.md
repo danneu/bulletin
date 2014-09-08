@@ -2,7 +2,7 @@
 
 A bulletin board service (like [proboards](http://www.proboards.com/)) written in Clojure.
 
-A recently started stubbing out an experimental forum system at [www.fed.nu](http://www.fed.nu) (to learn Koa), so that's what this is kinda gonna look like.
+Live demo: [www.fed.nu](http://www.fed.nu) (It's very rough)
 
 ## Setting up for local development
 
