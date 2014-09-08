@@ -525,9 +525,10 @@
                                :cookie-attrs {:domain
                                               ;; FIXME: Dumb way to extract foo.com
                                               ;; from foo.com:3000
-                                              (str "." (-> config/app-domain
-                                                           (str/split #":")
-                                                           first))}
+                                              (let [cookie-domain (-> config/app-domain
+                                                                      (str/split #":")
+                                                                      first)]
+                                                (str "." cookie-domain))}
                                :store (cookie-store
                                        ;; 16-byte secret
                                        {:key "abcdefghijklmnop"})}})

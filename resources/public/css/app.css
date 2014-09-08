@@ -136,3 +136,12 @@ body { margin-top: 10px; }
 #notification-popover .list-group {
     margin-bottom: 0;
 }
+
+/*
+   Style the ez-login.js creds as links so it's obv they're clickable
+*/
+
+.test-creds {
+    text-decoration: underline;
+    cursor: pointer;
+}

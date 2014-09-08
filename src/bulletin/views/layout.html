@@ -50,16 +50,19 @@
         {% else %}
           <!-- When not logged in -->
           <form class="navbar-form navbar-right"
+                id="login"
                 action="/sessions"
                 method="post">
             <div class="form-group">
               <input name="creds[username]"
+                     id="username"
                      type="text"
                      class="form-control"
                      placeholder="Username">
             </div>
             <div class="form-group">
               <input name="creds[password]"
+                     id="password"
                      type="password"
                      class="form-control"
                      placeholder="Password">
@@ -95,7 +98,8 @@
 
     </div> <!-- /container -->
 
-    <!-- <script src="{{= it.this.js_vendor_path}}"></script> -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/ez-login.js"></script>
     <!-- <script src="{{= it.this.js_app_path}}"></script> -->
   </body>
 </html>
