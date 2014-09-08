@@ -30,7 +30,7 @@
 <ul>
   {% for community in communities %}
   <li>
-    <a href="http://{{ community.slug }}.bulletin.dev:3000">
+    <a href="http://{{community.slug}}.{{config.app-domain}}">
       {{ community.title }}
     </a>
     &mdash; {{ community.created_at|date:shortDateTime }}

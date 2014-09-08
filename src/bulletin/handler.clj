@@ -436,7 +436,8 @@
       (let [communities (db/find-communities)]
         (p/render-file "bulletin/views/homepage.html"
                        {:communities communities
-                        :current-user *current-user*}))))
+                        :current-user *current-user*
+                        :config config/config}))))
   ;;
   ;; Create community
   ;;
@@ -500,13 +501,19 @@
       response)))
 
 (def app
+  ;; TODO: Only use dev middleware in dev mode, not in production
   (-> app-routes ;(routes home-routes app-routes)
       ((ignore-assets wrap-current-user))
       ((ignore-assets wrap-current-community))
       (wrap-method-override)
       ((ignore-assets wrap-echo))
       (handler/site {:session {:cookie-name "bulletin-session"
-                               :cookie-attrs {:domain ".bulletin.dev"}
+                               :cookie-attrs {:domain
+                                              ;; FIXME: Dumb way to extract foo.com
+                                              ;; from foo.com:3000
+                                              (str "." (-> config/app-domain
+                                                           (str/split #":")
+                                                           first))}
                                :store (cookie-store
                                        ;; 16-byte secret
                                        {:key "abcdefghijklmnop"})}})
@@ -515,5 +522,5 @@
       (prone/wrap-exceptions)))
 
 (defn -main [& args]
-  (run-server #'app {:port (Integer/parseInt config/port)})
+  (run-server #'app {:port config/port})
   (println "Bulletin started on" config/port))
