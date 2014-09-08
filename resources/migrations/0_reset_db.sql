@@ -49,7 +49,7 @@ CREATE TABLE forums (
 CREATE TABLE sessions (
   id            uuid            PRIMARY KEY,
   user_id       int             REFERENCES users(id),
-  created_at    timestamp       NOT NULL  DEFAULT CURRENT_TIMESTAMP
+  created_at    timestamp with time zone       NOT NULL  DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE topics (
@@ -84,7 +84,7 @@ CREATE TABLE reports (
   user_id      int              NOT NULL  REFERENCES users(id),
   post_id      int              NOT NULL  REFERENCES posts(id),
   message      text             NOT NULL,
-  created_at   timestamp        NOT NULL  DEFAULT CURRENT_TIMESTAMP
+  created_at   timestamp with time zone       NOT NULL  DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE likes (
