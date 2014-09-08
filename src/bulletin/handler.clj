@@ -515,5 +515,5 @@
       (prone/wrap-exceptions)))
 
 (defn -main [& args]
-  (run-server #'app {:port config/port})
+  (run-server #'app {:port (Integer/parseInt config/port)})
   (println "Bulletin started on" config/port))
