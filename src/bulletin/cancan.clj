@@ -1,8 +1,10 @@
 (ns bulletin.cancan
-  (:require
-   ;; db namespace is only for testing in this buffer repl.
-   ;; should not actually be used in this namespace.
-   [bulletin.db :as db]))
+  ;; (:require
+  ;;  ;; db namespace is only for testing in this buffer repl.
+  ;;  ;; should not actually be used in this namespace.
+  ;;  ;[bulletin.db :as db]
+  ;;  )
+)
 
 
 ;;;;
@@ -65,15 +67,15 @@
 (def get-comm-roles get-community-roles)
 
 ;; TODO: Tests
-(def users {:gadmin (db/find-user 1)
-            :cadmin1 (db/find-user 2)
-            :cadmin2 (db/find-user 3)
-            :smod1 (db/find-user 4)
-            :smod2 (db/find-user 5)
-            :mod1-f1 (db/find-user 6)
-            :mod1-f2 (db/find-user 7)
-            :member (db/find-user 8)
-            })
+;; (def users {:gadmin (db/find-user 1)
+;;             :cadmin1 (db/find-user 2)
+;;             :cadmin2 (db/find-user 3)
+;;             :smod1 (db/find-user 4)
+;;             :smod2 (db/find-user 5)
+;;             :mod1-f1 (db/find-user 6)
+;;             :mod1-f2 (db/find-user 7)
+;;             :member (db/find-user 8)
+;;             })
 
 (defn guest?
   "User is not logged in"
@@ -81,8 +83,9 @@
   (nil? (:id user)))
 
 ;; (let [com1 (db/find-community 1)]
-;;   (assert (member? (get-comm-roles (:member users) com1)))
-;;   (assert (false? (member? (get-community-roles (:cadmin1 users) com1))))
+;;   ;(assert (member? (get-comm-roles (:member users) com1)))
+;;   ;(assert (false? (member? (get-community-roles (:cadmin1 users) com1))))
+;;   (get-comm-roles (:cadmin1 users) com1)
 ;;   )
 
 
