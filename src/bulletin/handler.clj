@@ -69,6 +69,7 @@
         (handler request)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; TODO: init and destroy aren't run in uberjar
 (defn init []
   (println "bulletin is starting")
   (println config/database-url)
@@ -76,6 +77,7 @@
   ;; TODO: Only do this in dev
   (p/cache-off!))
 
+;; TODO: init and destroy aren't run in uberjar
 (defn destroy []
   (println "bulletin is shutting down"))
 
