@@ -92,7 +92,8 @@
   ;;
   (GET "/register" []
     (p/render-file "bulletin/views/community/register.html"
-                   {:current-community *current-community*}))
+                   {:current-community *current-community*
+                    :config config/config}))
   ;;
   ;; Edit user page
   ;;
@@ -107,7 +108,8 @@
                       :role (or (first (can/get-comm-roles user *current-community*))
                                 "member")
                       :user user
-                      :req req})))
+                      :req req
+                      :config config/config})))
   ;;
   ;; Show user
   ;;
@@ -121,7 +123,8 @@
                       :role (or (first (can/get-comm-roles user *current-community*))
                                 "member")
                       :user user
-                      :req req})))
+                      :req req
+                      :config config/config})))
   ;;
   ;; Create user
   ;;
@@ -164,7 +167,8 @@
           (assoc-in [:flash :message] ["danger" "You can't create categories"]))
       (p/render-file "bulletin/views/community/new_category.html"
                      {:current-user *current-user*
-                      :current-community *current-community*})))
+                      :current-community *current-community*
+                      :config config/config})))
   ;;
   ;; New forum page
   ;;
@@ -178,7 +182,8 @@
         (p/render-file "bulletin/views/community/new_forum.html"
                        {:current-user *current-user*
                         :current-community *current-community*
-                        :categories categories}))))
+                        :categories categories
+                        :config config/config}))))
   ;;
   ;; Create forum
   ;;
@@ -290,7 +295,8 @@
                                           :can-create-topic?
                                           can-create-topic?)
                           :forum forum
-                          :topics topics})))))
+                          :topics topics
+                          :config config/config})))))
   ;;
   ;; Create topic
   ;;
@@ -386,7 +392,8 @@
                                             (assoc :can-create-post?
                                               can-create-post?))
                           :topic topic
-                          :posts posts})))))
+                          :posts posts
+                          :config config/config})))))
   ;;
   ;; Show post (html - use /api/post via ajax)
   ;;
@@ -431,7 +438,8 @@
                                           (assoc :can-create-forum?
                                             can-create-forum?))
                         :categories categories
-                        :req req}))
+                        :req req
+                        :config config/config}))
       ;; www homepage
       (let [communities (db/find-communities)]
         (p/render-file "bulletin/views/homepage.html"
