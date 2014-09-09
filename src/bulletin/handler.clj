@@ -21,8 +21,16 @@
             [noir.util.crypt :as crypt]
             [bulletin.cancan :as can]
             [selmer.parser :as p]
+            [selmer.filters :as filters]
             [bulletin.db :as db])
   (:gen-class))
+
+;; java.sql.Timestamp -> UTCString
+;; My custom selmer filter for turning java.sql.Timestamp into UTC strings
+;; since `str` drops the timezone data thus timeago thinks it's local time.
+(defn timestamp [timestamp]
+  (let [literal (pr-str timestamp)]
+    (subs literal 7 (dec (count literal)))))
 
 ;; TODO: Extract somewhere or implement via selmer filter
 (defn ->hex-color [s]
@@ -553,5 +561,6 @@
       (prone/wrap-exceptions)))
 
 (defn -main [& args]
+  (filters/add-filter! :timestamp timestamp)
   (run-server #'app {:port config/port})
   (println "Bulletin started on" config/port))

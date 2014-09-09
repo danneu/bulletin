@@ -28,7 +28,7 @@
         <a href="/forums/{{ forum.id }}/topics/{{ topic.id }}">{{ topic.title }}</a>
         <br>
         by {{ topic.user.username }},
-        <span class="timeago" title="{{topic.created_at}}">{{topic.created_at|date:shortDateTime}}</span>
+        <span class="timeago" title="{{topic.created_at|timestamp}}">{{topic.created_at|date:shortDateTime}}</span>
       </div>
       <div class="col-md-2">{{ topic.posts_count }} posts</div>
       <!-- Latest post -->

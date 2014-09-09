@@ -26,7 +26,7 @@
 <div class="post-panel panel panel-default" id="post-{{ post.id }}">
   <!-- Panel heading -->
   <div class="panel-heading clearfix">
-    <div class="pull-left timeago" title="{{post.created_at}}">{{post.created_at|date:shortDateTime}}</div>
+    <div class="pull-left timeago" title="{{post.created_at|timestamp}}">{{post.created_at|date:shortDateTime}}</div>
     <!--<div style="margin-left: 5px; color: #bdbdbd" class="pull-left edited-marker" title=""></div>-->
     <div class="pull-right">
       <a href="/posts/{{ post.id }}" style="color: #bdbdbd;">
@@ -46,7 +46,6 @@
     </div>
     <div class="col-md-10">
       <div class="post-body">{{post.text}}</div>
-      <div>{{post.created_at}}</div>
     </div>
   </div>
   <!-- Panel footer -->
