@@ -47,5 +47,6 @@ The website should now be running on `http://localhost:3000`.
 - Add pagination to topics and posts
 - Add post permalinking
 - Link "Latest Post" in community/forum views to the last post's permalink instead of just the topic
+- Now that I'm rendering markdown on the client side, my Reply and Edit buttons no longer have to hit the server to get the original post markdown.
 
 And much much more...
