@@ -32,6 +32,8 @@
   (let [literal (pr-str timestamp)]
     (subs literal 7 (dec (count literal)))))
 
+(filters/add-filter! :timestamp timestamp)
+
 ;; TODO: Extract somewhere or implement via selmer filter
 (defn ->hex-color [s]
   (->> (pandect/md5 s)
@@ -561,6 +563,5 @@
       (prone/wrap-exceptions)))
 
 (defn -main [& args]
-  (filters/add-filter! :timestamp timestamp)
   (run-server #'app {:port config/port})
   (println "Bulletin started on" config/port))

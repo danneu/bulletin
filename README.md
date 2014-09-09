@@ -43,5 +43,9 @@ The website should now be running on `http://localhost:3000`.
 - Reuse views/community layout on www homepage
 - Add profiling per route
 - Add logging
+- Change my custom `timestamp` Selmer filter to `utc` which ensures java.sql.Timestamp and any other date representations are represented as utc strings. That way I can just apply `{{some_date|utc}}` to anything without checking to see if it's a java.sql.Timestamp or a to_json string first.
+- Add pagination to topics and posts
+- Add post permalinking
+- Link "Latest Post" in community/forum views to the last post's permalink instead of just the topic
 
 And much much more...
