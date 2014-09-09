@@ -49,6 +49,7 @@
     (j/query conn ["
 SELECT *
 FROM communities
+ORDER BY created_at DESC
 "])))
 
 ;; Returns {..., :forum {...}}
